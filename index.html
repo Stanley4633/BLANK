@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Fit Plain Shirts</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f7f9fa;
+            color: #333;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .product-container {
+            background: #ffffff;
+            max-width: 500px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 20px;
+        }
+
+        .product-image-placeholder {
+            width: 100%;
+            height: 220px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            border: 1px solid #cbd5e1;
+        }
+
+        .preview-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+            text-transform: none;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 15px 0 5px 0;
+        }
+
+        /* Rating System */
+        .rating-section {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .star {
+            font-size: 24px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star.selected {
+            color: #f59e0b;
+        }
+
+        .price-stock-tag {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .price {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .stock-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .in-stock { background-color: #dcfce7; color: #15803d; }
+        .out-of-stock { background-color: #fee2e2; color: #b91c1c; }
+
+        label {
+            font-weight: 600;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+
+        /* Scrollable Color Picker Box */
+        .color-picker-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: #f8fafc;
+        }
+
+        .color-group-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin: 8px 0 4px 0;
+        }
+
+        .color-group-title:first-child { margin-top: 0; }
+
+        .color-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+
+        .color-swatch:hover { transform: scale(1.15); }
+        .color-swatch.active { border-color: #0f172a; transform: scale(1.15); }
+
+        /* Setup White Swatch Visibility */
+        .color-swatch[title="Pure White"], .color-swatch[title="Off-White"] {
+            border: 1px solid #cbd5e1;
+        }
+
+        .selector-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #fff;
+            font-size: 15px;
+        }
+
+        .order-btn {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .order-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Success Pop-up */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal h2 { color: #16a34a; margin-bottom: 10px; }
+        .modal p { line-height: 1.5; color: #475569; }
+        .modal button {
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="product-container">
+    <div class="product-image-placeholder" id="shirtPreview">
+        <span id="shirtColorName">Loading...</span>
+        <span class="preview-label" id="shirtColorCategory">Category</span>
+    </div>
+
+    <h1>Custom Fit Plain Shirt</h1>
+    
+    <div class="rating-section">
+        <span class="star" onclick="rateProduct(1)">★</span>
+        <span class="star" onclick="rateProduct(2)">★</span>
+        <span class="star" onclick="rateProduct(3)">★</span>
+        <span class="star" onclick="rateProduct(4)">★</span>
+        <span class="star" onclick="rateProduct(5)">★</span>
+        <span id="ratingText" style="font-size:14px; color:#64748b; margin-left:5px;">(Tap to rate)</span>
+    </div>
+
+    <div class="price-stock-tag">
+        <div class="price" id="priceDisplay">$25.00</div>
+        <div class="stock-status in-stock" id="stockDisplay">In Stock</div>
+    </div>
+
+    <label>Select Your Shade (55 Exact Colors)</label>
+    <div class="color-picker-box" id="colorPickerContainer"></div>
+
+    <div class="selector-group">
+        <div>
+            <label for="sizeSelect">Size (Width)</label>
+            <select id="sizeSelect" onchange="updateProductDetails()">
+                <option value="XS">XS</option>
+                <option value="S">S</option>
+                <option value="M" selected>M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+            </select>
+        </div>
+        <div>
+            <label for="heightSelect">Body Height</label>
+            <select id="heightSelect" onchange="updateProductDetails()">
+                <option value="Short">Short (&lt; 5'7")</option>
+                <option value="Regular" selected>Regular (5'7"-6'1")</option>
+                <option value="Tall">Tall (6'1"+)</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="order-btn" id="orderBtn" onclick="placeOrder()">Place Order</button>
+</div>
+
+<div class="overlay" id="orderOverlay">
+    <div class="modal">
+        <h2>Order Request Received! 👕</h2>
+        <p id="orderSummary"></p>
+        <button onclick="closeModal()">Back to Shop</button>
+    </div>
+</div>
+
+<script>
+    // Exact Organized List of 55 Real-world Fabric Shades
+    const colorDataset = [
+        {
+            category: "Red & Pink Shades",
+            items: [
+                { name: "Crimson Red", hex: "#b91c1c", textDark: false },
+                { name: "Ruby Maroon", hex: "#7f1d1d", textDark: false },
+                { name: "Scarlet Red", hex: "#ef4444", textDark: false },
+                { name: "Burnt Brick", hex: "#991b1b", textDark: false },
+                { name: "Coral Rose", hex: "#f87171", textDark: true },
+                { name: "Pastel Pink", hex: "#fbcfe8", textDark: true },
+                { name: "Hot Pink", hex: "#ec4899", textDark: false },
+                { name: "Dusty Rose", hex: "#fda4af", textDark: true }
+            ]
+        },
+        {
+            category: "Blue & Navy Shades",
+            items: [
+                { name: "Midnight Navy", hex: "#0f172a", textDark: false },
+                { name: "Classic Royal Blue", hex: "#1d4ed8", textDark: false },
+                { name: "Sky Blue", hex: "#7dd3fc", textDark: true },
+                { name: "Baby Blue", hex: "#bae6fd", textDark: true },
+                { name: "Steel Blue", hex: "#475569", textDark: false },
+                { name: "Ocean Teal", hex: "#0f766e", textDark: false },
+                { name: "Turquoise Blue", hex: "#06b6d4", textDark: true },
+                { name: "Electric Indigo", hex: "#4338ca", textDark: false }
+            ]
+        },
+        {
+            category: "Green Shades",
+            items: [
+                { name: "Forest Green", hex: "#14532d", textDark: false },
+                { name: "Olive Drab", hex: "#3f6212", textDark: false },
+                { name: "Emerald Green", hex: "#047857", textDark: false },
+                { name: "Mint Leaf", hex: "#a7f3d0", textDark: true },
+                { name: "Sage Green", hex: "#86efac", textDark: true },
+                { name: "Army Green", hex: "#166534", textDark: false },
+                { name: "Lime Zing", hex: "#84cc16", textDark: true },
+                { name: "Pistachio", hex: "#bbf7d0", textDark: true }
+            ]
+        },
+        {
+            category: "Yellow & Orange Shades",
+            items: [
+                { name: "Mustard Gold", hex: "#eab308", textDark: true },
+                { name: "Canary Yellow", hex: "#fef08a", textDark: true },
+                { name: "Sunset Orange", hex: "#f97316", textDark: false },
+                { name: "Burnt Orange", hex: "#c2410c", textDark: false },
+                { name: "Peach Fuzz", hex: "#ffedd5", textDark: true },
+                { name: "Apricot Crush", hex: "#fed7aa", textDark: true },
+                { name: "Ginger Spice", hex: "#ea580c", textDark: false }
+            ]
+        },
+        {
+            category: "Purple & Lavender Shades",
+            items: [
+                { name: "Deep Royal Plum", hex: "#581c87", textDark: false },
+                { name: "Grape Purple", hex: "#701a75", textDark: false },
+                { name: "Orchid Violet", hex: "#a855f7", textDark: false },
+                { name: "Soft Lavender", hex: "#e9d5ff", textDark: true },
+                { name: "Lilac Mist", hex: "#f3e8ff", textDark: true },
+                { name: "Berry Magenta", hex: "#d946ef", textDark: false },
+                { name: "Mauve Earth", hex: "#c084fc", textDark: true }
+            ]
+        },
+        {
+            category: "Earth Tones & Browns",
+            items: [
+                { name: "Chocolate Brown", hex: "#451a03", textDark: false },
+                { name: "Espresso Coffee", hex: "#78350f", textDark: false },
+                { name: "Camel Tan", hex: "#b45309", textDark: false },
+                { name: "Safari Khaki", hex: "#d97706", textDark: true },
+                { name: "Desert Sand", hex: "#fef3c7", textDark: true },
+                { name: "Mocha Beige", hex: "#f5e0c3", textDark: true },
+                { name: "Terracotta Clay", hex: "#b45309", textDark: false }
+            ]
+        },
+        {
+            category: "Monochrome & Neutrals",
+            items: [
+                { name: "Pitch Black", hex: "#000000", textDark: false },
+                { name: "Charcoal Gray", hex: "#334155", textDark: false },
+                { name: "Slate Gray", hex: "#64748b", textDark: false },
+                { name: "Heather Gray", hex: "#94a3b8", textDark: true },
+                { name: "Silver Ash", hex: "#cbd5e1", textDark: true },
+                { name: "Light Platinum", hex: "#f1f5f9", textDark: true },
+                { name: "Off-White", hex: "#fafaf9", textDark: true },
+                { name: "Pure White", hex: "#ffffff", textDark: true }
+            ]
+        }
+    ];
+
+    let selectedColor = colorDataset[0].items[0]; 
+    let selectedCategory = colorDataset[0].category;
+
+    // Build the Grid Structure dynamically
+    const container = document.getElementById('colorPickerContainer');
+    
+    colorDataset.forEach(group => {
+        const title = document.createElement('div');
+        title.classList.add('color-group-title');
+        title.innerText = group.category;
+        container.appendChild(title);
+
+        const grid = document.createElement('div');
+        grid.classList.add('color-grid');
+
+        group.items.forEach(color => {
+            const swatch = document.createElement('div');
+            swatch.classList.add('color-swatch');
+            swatch.style.backgroundColor = color.hex;
+            swatch.title = color.name;
+            
+            // Highlight the initial selected color
+            if(color.name === selectedColor.name) swatch.classList.add('active');
+
+            swatch.addEventListener('click', () => {
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+                selectedColor = color;
+                selectedCategory = group.category;
+                updateProductDetails();
+            });
+
+            grid.appendChild(swatch);
+        });
+
+        container.appendChild(grid);
+    });
+
+    // 1 to 5 Star Rating Logic
+    function rateProduct(stars) {
+        const starElements = document.querySelectorAll('.star');
+        starElements.forEach((star, index) => {
+            if (index < stars) {
+                star.classList.add('selected');
+            } else {
+                star.classList.remove('selected');
+            }
+        });
+        document.getElementById('ratingText').innerText = `(${stars} Star Rating Saved!)`;
+    }
+
+    // Interactive Price, UI, and Stock Status Handler
+    function updateProductDetails() {
+        const size = document.getElementById('sizeSelect').value;
+        const height = document.getElementById('heightSelect').value;
+        const priceDisplay = document.getElementById('priceDisplay');
+        const stockDisplay = document.getElementById('stockDisplay');
+        const orderBtn = document.getElementById('orderBtn');
+        
+        // Update Canvas Viewbox
+        const previewBox = document.getElementById('shirtPreview');
+        previewBox.style.backgroundColor = selectedColor.hex;
+        document.getElementById('shirtColorName').innerText = selectedColor.name;
+        document.getElementById('shirtColorCategory').innerText = selectedCategory;
+
+        // Auto contrast text layout switch
+        previewBox.style.color = selectedColor.textDark ? '#1e293b' : '#ffffff';
+
+        // Custom Pricing Rules per Combination
+        let basePrice = 24.99;
+        if (size === 'XL') basePrice += 3.00;
+        if (height === 'Tall') basePrice += 2.50;
+        priceDisplay.innerText = `$${basePrice.toFixed(2)}`;
+
+        // Simulated Warehouse Rules (Simulating out-of-stock variations)
+        const isOutOfStock = 
+            (selectedColor.name === "Pure White" && size === "XS") || 
+            (selectedColor.name === "Pitch Black" && height === "Tall") ||
+            (selectedColor.name === "Mint Leaf" && size === "XL");
+
+        if (isOutOfStock) {
+            stockDisplay.innerText = "Out of Stock";
+            stockDisplay.className = "stock-status out-of-stock";
+            orderBtn.disabled = true;
+            orderBtn.innerText = "Out of Stock";
+        } else {
+            stockDisplay.innerText = "In Stock";
+            stockDisplay.className = "stock-status in-stock";
+            orderBtn.disabled = false;
+            orderBtn.innerText = "Place Order";
+        }
+    }
+
+    // Modal Confirmation Engine
+    function placeOrder() {
+        const size = document.getElementById('sizeSelect').value;
+        const height = document.getElementById('heightSelect').value;
+        const price = document.getElementById('priceDisplay').innerText;
+        
+        document.getElementById('orderSummary').innerHTML = `
+            Your order details have been captured: <br><br>
+            👕 Color: <strong>${selectedColor.name}</strong> (${selectedCategory})<br>
+            📏 Width: <strong>Size ${size}</strong><br>
+            📐 Height Fit: <strong>${height} Edition</strong><br>
+            💵 Final Price: <strong>${price}</strong><br><br>
+            <em>Next Step: Integrate this code into a database to collect payments!</em>
+        `;
+        document.getElementById('orderOverlay').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('orderOverlay').style.display = 'none';
+    }
+
+    // Initial Load execution
+    updateProductDetails();
+</script>
+
+</body>
+</html>
